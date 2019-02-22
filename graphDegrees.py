@@ -1,7 +1,3 @@
-'''
-I am trying to follow this tutorial: http://www.astropy.org/astropy-tutorials/plot-catalog.html
-'''
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas
@@ -9,10 +5,30 @@ from astropy.wcs import WCS
 import astropy.coordinates as coord
 import astropy.units as u
 
-import importlib
-# get data 
-importlib.import_module(readColumns)
+# Reading in the data -------------------------------------------------------------------------------
+df = pandas.read_csv('SwiftSNweblist.csv', usecols= ['type', 'SNra', 'SNdec'])
 
+#replace empty with Nan
+df = df.replace(r'^\s*$', np.nan, regex=True) 
+
+#drop rows with Nan in SNra or SNdec columns
+df = df.dropna(subset=['SNra', 'SNdec']) 
+
+# reset the index from 0
+df = df.reset_index(drop=True)
+
+# delete header row
+df = df.drop(df.index[0])
+
+#delete /t
+df = df.replace(r'\s', '', regex = True)
+
+# take each column out of the dataframe
+SNtype = df.type
+SNra = df.SNra
+SNdec = df.SNdec
+
+# ---------------------------------------------------------------------------------------------------
 '''
 # Testing whether it works for an individual value
 ra = coord.Angle(SNra[9], unit=u.hour)
