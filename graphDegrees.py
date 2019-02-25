@@ -32,33 +32,20 @@ type = df.type
 ra = df.ra
 dec = df.dec
 
-'''
-print("Does it work for one value? ")
-c = SkyCoord(ra[1], dec[1], unit=(u.hour, u.degree))
-print(c)
-'''
-
 # to graph
-print ("Generating degrees")
 CoordSets = []
 radianRA = []
 radianDEC = []
 
 for i in range(1,len(ra)):
   c = SkyCoord(ra[i], dec[i], unit=(u.hour, u.degree))
+  c.ra.wrap_angle = 180 * u.deg
   radianRA.append(m.radians(c.ra.degree))
   radianDEC.append(m.radians(c.dec.degree))
-  #degreeRA.append(c.ra.degree)
-  #degreeDEC.append(c.dec.degree)
   CoordSets.append(c)
 
 radianRA = np.asarray(radianRA)
 radianDEC = np.asarray(radianDEC)
-
-#print(degreeRA) # long
-#print(degreeDEC) #lat
-
-#ra = ra.wrap_at(180*u.degree)
 
 # graphing
 fig = plt.figure(figsize=(8,6))
