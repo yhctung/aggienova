@@ -1,18 +1,21 @@
+#http://www.astropy.org/astropy-tutorials/plot-catalog.html
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas
-from astropy.wcs import WCS
-import astropy.coordinates as coord
-import astropy.units as u
 
-# Reading in the data -------------------------------------------------------------------------------
-df = pandas.read_csv('SwiftSNweblist.csv', usecols= ['type', 'SNra', 'SNdec'])
+import matplotlib.pyplot as plt
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+
+# works, but SNname is an array
+df = pandas.read_csv('SwiftSNweblist.csv', usecols= ['type', 'ra', 'dec'])
+SNname = np.genfromtxt('SwiftSNweblist.csv', delimiter=',',dtype = str, usecols=(0), unpack=True)
 
 #replace empty with Nan
 df = df.replace(r'^\s*$', np.nan, regex=True) 
+df = df.replace(r'ra', np.nan, regex=True) 
 
 #drop rows with Nan in SNra or SNdec columns
-df = df.dropna(subset=['SNra', 'SNdec']) 
+df = df.dropna(subset=['ra', 'dec']) 
 
 # reset the index from 0
 df = df.reset_index(drop=True)
@@ -24,26 +27,34 @@ df = df.drop(df.index[0])
 df = df.replace(r'\s', '', regex = True)
 
 # take each column out of the dataframe
-SNtype = df.type
-SNra = df.SNra
-SNdec = df.SNdec
+type = df.type
+ra = df.ra
+dec = df.dec
 
-# ---------------------------------------------------------------------------------------------------
+
 '''
-# Testing whether it works for an individual value
-ra = coord.Angle(SNra[9], unit=u.hour)
-print(ra.degree)
+print("Does it work for one value? ")
+c = SkyCoord(ra[1], dec[1], unit=(u.hour, u.degree))
+print(c)
 '''
 
 # to graph
 print ("Generating degrees")
-raDegrees = []
+degreeSets = []
+degreeRA = []
+degreeDEC = []
 
-for i in range(1,len(SNra)):
-  ra = coord.Angle(SNra[i], unit=u.hour)
-  raDegrees.append(ra.degree)
+for i in range(1,len(ra)):
+  c = SkyCoord(ra[i], dec[i], unit=(u.hour, u.degree))
+  degreeRA.append(c.ra)
+  degreeDEC.append(c.dec)
+  #degreeRA.append(c.ra.radians)
+  #degreeDEC.append(c.dec.radians)
+  degreeSets.append(c)
 
-#print(*raDegrees, sep = "\n") 
+#degreeRA = np.asarray(degreeRA)
+#degreeDEC = np.asarray(degreeDEC)
+print(degreeRA)
 
 '''
 # from website
@@ -57,11 +68,10 @@ ra = ra.wrap_at(180*u.degree)
 print("wrap success")
 print(ra)
 dec = coord.Angle(SNdec*u.degree)
-'''
 
-'''
 # graphing
+#ra = ra.wrap_at(180*u.degree)
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(111, projection="mollweide")
-ax.scatter(ra.radian, dec.radian)
+ax.scatter(degreeRA, degreeDEC)
 '''
