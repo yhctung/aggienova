@@ -7,15 +7,15 @@ import pandas                             # for dataframes
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-# works, but SNname is an array
+# read data into dataframe, SNname is separate array
 df = pandas.read_csv('SwiftSNweblist.csv', usecols= ['type', 'ra', 'dec'])
 SNname = np.genfromtxt('SwiftSNweblist.csv', delimiter=',',dtype = str, usecols=(0), unpack=True)
 
-#replace empty with Nan
+#replace empty and random ra/dec with Nan
 df = df.replace(r'^\s*$', np.nan, regex=True) 
 df = df.replace(r'ra', np.nan, regex=True) 
 
-#drop rows with Nan in SNra or SNdec columns
+#drop rows with Nan in ra or dec columns
 df = df.dropna(subset=['ra', 'dec']) 
 
 # reset the index from 0
