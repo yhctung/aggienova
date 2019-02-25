@@ -1,8 +1,9 @@
 #http://www.astropy.org/astropy-tutorials/plot-catalog.html
-import numpy as np
-import pandas
 
-import matplotlib.pyplot as plt
+import numpy as np
+import math as m                          # for radians
+import matplotlib.pyplot as plt           # for graphing
+import pandas                             # for dataframes
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
@@ -31,7 +32,6 @@ type = df.type
 ra = df.ra
 dec = df.dec
 
-
 '''
 print("Does it work for one value? ")
 c = SkyCoord(ra[1], dec[1], unit=(u.hour, u.degree))
@@ -40,38 +40,30 @@ print(c)
 
 # to graph
 print ("Generating degrees")
-degreeSets = []
-degreeRA = []
-degreeDEC = []
+CoordSets = []
+radianRA = []
+radianDEC = []
 
 for i in range(1,len(ra)):
   c = SkyCoord(ra[i], dec[i], unit=(u.hour, u.degree))
-  degreeRA.append(c.ra)
-  degreeDEC.append(c.dec)
-  #degreeRA.append(c.ra.radians)
-  #degreeDEC.append(c.dec.radians)
-  degreeSets.append(c)
+  radianRA.append(m.radians(c.ra.degree))
+  radianDEC.append(m.radians(c.dec.degree))
+  #degreeRA.append(c.ra.degree)
+  #degreeDEC.append(c.dec.degree)
+  CoordSets.append(c)
 
-#degreeRA = np.asarray(degreeRA)
-#degreeDEC = np.asarray(degreeDEC)
-print(degreeRA)
+radianRA = np.asarray(radianRA)
+radianDEC = np.asarray(radianDEC)
 
-'''
-# from website
-ra = coord.Angle(SNra, u.hour)
-print("angle success")
-print(ra)
-ra = ra.degree
-print("degree success")
-print(ra)
-ra = ra.wrap_at(180*u.degree)
-print("wrap success")
-print(ra)
-dec = coord.Angle(SNdec*u.degree)
+#print(degreeRA) # long
+#print(degreeDEC) #lat
+
+#ra = ra.wrap_at(180*u.degree)
 
 # graphing
-#ra = ra.wrap_at(180*u.degree)
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(111, projection="mollweide")
-ax.scatter(degreeRA, degreeDEC)
-'''
+ax.scatter(radianRA, radianDEC)
+ax.set_xticklabels(['14h','16h','18h','20h','22h','0h','2h','4h','6h','8h','10h'])
+ax.grid(True)
+fig.savefig("map.pdf")
