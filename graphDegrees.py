@@ -1,65 +1,58 @@
-#http://www.astropy.org/astropy-tutorials/plot-catalog.html
-
 import numpy as np
 import math as m                          # for radians
 import matplotlib.pyplot as plt           # for graphing
 import pandas                             # for dataframes
 from astropy import units as u
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord  # for converting
 
 # read data into dataframe
 df = pandas.read_csv('SwiftSNweblist.csv', usecols= ['type', 'ra', 'dec'])
 
-#replace empty and random with Nan
-df = df.replace(r'^\s*$', np.nan, regex=True) 
+# clean up data
+df = df.replace(r'^\s*$', np.nan, regex=True)     # replace empty, random with Nan
 df = df.replace(r'ra', np.nan, regex=True) 
 df = df.replace(r'Unk', np.nan, regex=True) 
+df = df.replace(r'\s', '', regex = True)          
+df = df.dropna(subset=['type','ra', 'dec'])       # drop rows with Nan
 
-#drop rows with Nan
-df = df.dropna(subset=['type','ra', 'dec']) 
+df = df.reset_index(drop=True)                    # reset the index from 0
+df = df.drop(df.index[0])                         # delete header row
 
-# reset the index from 0
-df = df.reset_index(drop=True)
-
-# delete header row
-df = df.drop(df.index[0])
-
-#delete /t
-df = df.replace(r'\s', '', regex = True)
-
-# take each column out of the dataframe
+# get series from dataframe columns
 type = df.type
 ra = df.ra
 dec = df.dec
 
-# for color coding
-Ia = []   # red
-Ibc = []  # green
-II = []   # blue
-other = []
+# for color coding ----------------------
+# types
+#Ia = []   # red
+#Ibc = []  # green
+#II = []   # blue
+#other = []
 SNcolor = []
 
 for i in range(1,len(type)):
   current = type[i]
   if "Ia" in current:
-    Ia.append(i)
+    #Ia.append(i)
     SNcolor.append('red')
+  elif "II" in current:
+    #II.append(i)
+    SNcolor.append('blue')  
   elif "Ib" in current:
-    Ibc.append(i)
+    #Ibc.append(i)
     SNcolor.append('green')
   elif "Ic" in current:
-    Ibc.append(i)
-    SNcolor.append('green')  
-  elif "II" in current:
-    II.append(i)
-    SNcolor.append('blue')   
+    #Ibc.append(i)
+    SNcolor.append('green')     
   else:
-    other.append(i)
-    #SNcolor.append('temp')
+    #other.append(i)
     ra.drop(index = i)
     dec.drop(index = i)
 
 SNcolor = np.asarray(SNcolor)
+
+# graphing ------------------------------
 
 # converting to radians
 radianRA = []
@@ -75,7 +68,7 @@ for i in range(1,len(ra)):
 radianRA = np.asarray(radianRA)
 radianDEC = np.asarray(radianDEC)
 
-# graphing
+# plotting
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(111, projection="mollweide")
 ax.scatter(radianRA, radianDEC, color = SNcolor)
